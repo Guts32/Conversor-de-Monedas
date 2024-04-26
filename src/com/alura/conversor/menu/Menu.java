@@ -1,9 +1,8 @@
 package com.alura.conversor.menu;
 
-import java.util.Scanner;
-
 public class Menu {
-    public String getMenu(){
+    //Creacion de menu
+    public void getMenu(){
         String menu = """
                 ======================================================================
                                            MENÚ PRINCIPAL
@@ -19,6 +18,5 @@ public class Menu {
                 ======================================================================
                 Seleccione una opción:""";
         System.out.println(menu);
-        return menu;
     }
 }

@@ -7,12 +7,15 @@ import com.alura.conversor.menu.Menu;
 
 public class Main {
     public static void main(String[] args) {
+        //Creacion del Scanner
         Scanner sc = new Scanner(System.in);
         int opcion;
+        //Creando instancias
         Conversion conversion = new Conversion();
         Conexion conexion = new Conexion();
-        do {
 
+        //Mostrando menu y validando casos
+        do {
             Menu menu = new Menu();
             menu.getMenu();
             opcion = sc.nextInt();

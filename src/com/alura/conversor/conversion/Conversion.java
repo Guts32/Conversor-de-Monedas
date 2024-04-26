@@ -105,10 +105,31 @@ public class Conversion {
 
     //Moneda Usuario a Moneda Usuario
     public void cUToU() {
+        Conexion apiConexion = new Conexion();
         System.out.println("Digite el codigo de la moneda Base");
-        mBase = scanner.nextLine();
+        String codigoBase;
+        //Llamando el metodo para validar codigo de moneda
+        do {
+            codigoBase = scanner.nextLine();
+            if (!apiConexion.validarCodigoMoneda(codigoBase)) {
+                System.out.println("Digite un Codigo Valido");
+            }
+        } while (!apiConexion.validarCodigoMoneda(codigoBase));
+
+        mBase = codigoBase;
+
         System.out.println("Digite el codigo de la moneda de Cambio");
-        mCambio = scanner.nextLine();
+        String codigoCambio;
+        //Llamando el metodo para validar codigo de moneda
+        do {
+            codigoCambio = scanner.nextLine();
+            if (!apiConexion.validarCodigoMoneda(codigoCambio)) {
+                System.out.println("Digite un Codigo Valido");
+            }
+        } while (!apiConexion.validarCodigoMoneda(codigoCambio));
+
+        mCambio = codigoCambio;
+
         System.out.println("Digite el valor a convertir");
         while (!scanner.hasNextDouble()) {
             System.out.println("Por favor, ingrese un número válido.");
@@ -116,7 +137,7 @@ public class Conversion {
         }
 
         mConversion = scanner.nextDouble();
-        Conexion apiConexion = new Conexion();
+
         apiConexion.HttpClient(this.mBase, this.mCambio, this.mConversion);
     }
 }

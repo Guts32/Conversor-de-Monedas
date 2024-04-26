@@ -1,10 +1,7 @@
 package com.alura.conversor.conexion;
 
 import com.alura.conversor.conversion.Conversion;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -14,19 +11,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Conexion {
+
     Conversion conversion = new Conversion();
+    //Json estatico para almacenar datos de consulta
+    static JsonArray supportedCodesArray;
+
+    //Metodo para realizar conversiones
     public void HttpClient(String mBase, String mCambio, double mConversion) {
+        //clave de api
         String apiKey = "415a7578d6ba87811ce2a6d9";
+        //URL
         String url_str = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/"
                 + mBase + "/" + mCambio + "/" + mConversion;
 
         try {
+            //Conectando a api
             URL url = new URL(url_str);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
             int responseCode = conn.getResponseCode();
+            //Validando si se tiene conexion
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                //Almacenando en buffer
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder response = new StringBuilder();
                 String inputLine;
@@ -39,6 +46,7 @@ public class Conexion {
                 Gson gson = new Gson();
                 JsonObject json = gson.fromJson(response.toString(), JsonObject.class);
 
+                //Setear resultado con dos decimales
                 double conversionResult = json.get("conversion_result").getAsDouble();
                 String resultado = String.format("%.2f", conversionResult);
                 System.out.println("El resultado es: " + resultado);
@@ -49,23 +57,21 @@ public class Conexion {
             e.printStackTrace();
         }
     }
-
+//funcion para listar los codigos de monedas y paises
     public void HttpList(){
         try {
-            // Defino la URL de la API y tu clave de acceso
+            //url para obtener los codigos
             String url = "https://v6.exchangerate-api.com/v6/415a7578d6ba87811ce2a6d9/codes";
 
-            // Crea la conexión HTTP
+            //realizando conexion
             URL apiUrl = new URL(url);
             HttpURLConnection con = (HttpURLConnection) apiUrl.openConnection();
             con.setRequestMethod("GET");
 
-            // Obtiene el código de respuesta
             int responseCode = con.getResponseCode();
-
-            // Verifica el código de respuesta
+            //Validando conexion
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // La solicitud fue exitosa
+                //Almacenando en buffer
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String inputLine;
                 StringBuffer response = new StringBuffer();
@@ -73,20 +79,21 @@ public class Conexion {
                     response.append(inputLine);
                 }
                 in.close();
-
-                // Convierte la respuesta a un objeto JSON
+                //Usando Gson
                 Gson gson = new Gson();
                 JsonObject jsonObject = gson.fromJson(response.toString(), JsonObject.class);
 
-                // Accede a los datos de la respuesta (supported_codes)
-                JsonArray supportedCodesArray = jsonObject.getAsJsonArray("supported_codes");
+                supportedCodesArray = jsonObject.getAsJsonArray("supported_codes");
 
                 // Imprimir la lista de códigos de moneda y nombres de países
                 System.out.println("Códigos de moneda y nombres de países disponibles para conversión:");
+                //Llamando metodo para crear 4 columnas de codigos
                 mostrarEnColumnas(supportedCodesArray,4);
+                //Llamando el metodo para convertir
                 conversion.cUToU();
+                //Cerrando conexion
+                con.disconnect();
             } else {
-                // Manejar el caso en que la solicitud no fue exitosa
                 System.out.println("La solicitud no fue exitosa. Código de respuesta: " + responseCode);
             }
         } catch (Exception e) {
@@ -124,5 +131,19 @@ public class Conexion {
             }
             System.out.println();
         }
+    }
+
+    //Metodo para validar el Codigo de las Monedas
+    public boolean validarCodigoMoneda(String codigoMoneda) {
+        //Haciendo recorrido en el arreglo con los datos obtenidos de la lista
+        for (int i = 0; i < supportedCodesArray.size(); i++) {
+            JsonArray currencyArray = supportedCodesArray.get(i).getAsJsonArray();
+            String currencyCode = currencyArray.get(0).getAsString();
+            //validando si coincide el texto ingresado y el codigo de moneda
+            if (currencyCode.equals(codigoMoneda)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
