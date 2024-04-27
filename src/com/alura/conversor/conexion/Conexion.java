@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Conexion {
 
@@ -17,7 +18,7 @@ public class Conexion {
     static JsonArray supportedCodesArray;
 
     //Metodo para realizar conversiones
-    public void HttpClient(String mBase, String mCambio, double mConversion) {
+    public void httpClient(String mBase, String mCambio, double mConversion) {
         //clave de api
         String apiKey = "415a7578d6ba87811ce2a6d9";
         //URL
@@ -58,7 +59,7 @@ public class Conexion {
         }
     }
 //funcion para listar los codigos de monedas y paises
-    public void HttpList(){
+    public void httpList(){
         try {
             //url para obtener los codigos
             String url = "https://v6.exchangerate-api.com/v6/415a7578d6ba87811ce2a6d9/codes";
@@ -74,7 +75,7 @@ public class Conexion {
                 //Almacenando en buffer
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String inputLine;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
                 }
@@ -88,9 +89,9 @@ public class Conexion {
                 // Imprimir la lista de códigos de moneda y nombres de países
                 System.out.println("Códigos de moneda y nombres de países disponibles para conversión:");
                 //Llamando metodo para crear 4 columnas de codigos
-                mostrarEnColumnas(supportedCodesArray,4);
+                mostrarEnColumnas(supportedCodesArray);
                 //Llamando el metodo para convertir
-                conversion.cUToU();
+                codigoMoneda();
                 //Cerrando conexion
                 con.disconnect();
             } else {
@@ -103,14 +104,14 @@ public class Conexion {
     }
 
     // Método para mostrar la lista en varias columnas con columnas ajustadas en anchura
-    private static void mostrarEnColumnas(JsonArray array, int columnas) {
+    private static void mostrarEnColumnas(JsonArray array) {
         List<List<String>> columnData = new ArrayList<>();
-        int[] columnWidths = new int[columnas];
+        int[] columnWidths = new int[4];
 
         // Preparar datos para cada columna y calcular anchuras
-        for (int i = 0; i < columnas; i++) {
+        for (int i = 0; i < 4; i++) {
             List<String> column = new ArrayList<>();
-            for (int j = i; j < array.size(); j += columnas) {
+            for (int j = i; j < array.size(); j += 4) {
                 JsonArray currencyArray = array.get(j).getAsJsonArray();
                 String currencyCode = currencyArray.get(0).getAsString();
                 String countryName = currencyArray.get(1).getAsString();
@@ -122,8 +123,8 @@ public class Conexion {
         }
 
         // Imprimir datos con anchuras ajustadas
-        for (int i = 0; i < columnData.get(0).size(); i++) {
-            for (int j = 0; j < columnas; j++) {
+        for (int i = 0; i < columnData.getFirst().size(); i++) {
+            for (int j = 0; j < 4; j++) {
                 if (i < columnData.get(j).size()) {
                     String entry = columnData.get(j).get(i);
                     System.out.printf("%-" + (columnWidths[j] + 2) + "s", entry); // +2 para el espacio entre columnas
@@ -141,9 +142,44 @@ public class Conexion {
             String currencyCode = currencyArray.get(0).getAsString();
             //validando si coincide el texto ingresado y el codigo de moneda
             if (currencyCode.equals(codigoMoneda)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
+    }
+
+
+    //Metodo para obtener datos de teclado
+    public void codigoMoneda() {
+        Conexion apiConexion = new Conexion();
+        System.out.println("Digite el codigo de la moneda Base");
+        String codigoBase;
+        String mBase;
+        String mCambio;
+        double conversionResult;
+        //Llamando el metodo para validar codigo de moneda
+        Scanner scanner = new Scanner(System.in);
+        do {
+            codigoBase = scanner.nextLine();
+            if (apiConexion.validarCodigoMoneda(codigoBase)) {
+                System.out.println("Digite un Codigo Valido");
+            }
+        } while (apiConexion.validarCodigoMoneda(codigoBase));
+
+        mBase = codigoBase;
+
+        System.out.println("Digite el codigo de la moneda de Cambio");
+        String codigoCambio;
+        //Llamando el metodo para validar codigo de moneda
+        do {
+            codigoCambio = scanner.nextLine();
+            if (apiConexion.validarCodigoMoneda(codigoCambio)) {
+                System.out.println("Digite un Codigo Valido");
+            }
+        } while (apiConexion.validarCodigoMoneda(codigoCambio));
+
+        mCambio = codigoCambio;
+        conversion.convert(mBase,mCambio);
+
     }
 }

@@ -23,31 +23,31 @@ public class Main {
             switch (opcion) {
                 case 1:
                     System.out.println("Mostrando la lista de códigos de moneda y nombres de países...");
-                    conexion.HttpList();
+                    conexion.httpList();
                     break;
                 case 2:
                     System.out.println("Ha seleccionado la Opción de USD a BRL");
-                    conversion.cUsdToBRL();
+                    conversion.convert("USD","BRL");
                     break;
                 case 3:
                     System.out.println("Ha seleccionado la Opción de BRL a USD");
-                    conversion.cBRLToUSD();
+                    conversion.convert("BRL","USD");
                     break;
                 case 4:
                     System.out.println("Ha seleccionado la Opción de USD a ARS");
-                    conversion.cUsdToArs();
+                    conversion.convert("USD","ARS");
                     break;
                 case 5:
                     System.out.println("Ha seleccionado la Opción de USD a ARS");
-                    conversion.cArsToUsd();
+                    conversion.convert("ARS","USD");
                     break;
                 case 6:
                     System.out.println("Ha seleccionado la Opción de USD a COP");
-                    conversion.cUsdToCop();
+                    conversion.convert("USD","COP");
                     break;
                 case 7:
                     System.out.println("Ha seleccionado la Opción de COP a USD");
-                    conversion.cCopToUsd();
+                    conversion.convert("COP","USD");
                     break;
                 case 8:
                     System.out.println("Saliendo del programa...");
